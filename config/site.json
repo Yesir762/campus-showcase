@@ -1,0 +1,49 @@
+{
+  "schoolName": "学校名称待确认",
+  "shortName": "校园风光",
+  "eyebrow": "数字校园 · 测试预览",
+  "heroTitle": "从新的视角，\n遇见我们的校园",
+  "heroDescription": "以三维扫描保存校园此刻的光影与空间。当前为测试模型预览，正式校园资料与完整模型将在验收后替换。",
+  "aboutTitle": "校园，在时间与光影里生长",
+  "aboutDescription": "这里将呈现经学校确认的办学历史、校园特色与文化介绍。当前版本重点验证页面体验与三维模型接入流程，所有文字与视觉素材均可独立维护。",
+  "footerNote": "测试预览 · 内容与模型等待学校确认",
+  "theme": {
+    "primary": "#123d34",
+    "accent": "#d9a441"
+  },
+  "places": [
+    {
+      "id": "main-building",
+      "order": 1,
+      "name": "校园主楼",
+      "category": "校园地标",
+      "description": "景点资料占位。正式发布前，请替换为经学校确认的建筑名称、历史与用途介绍。",
+      "image": "/campus-scan-placeholder.jpg",
+      "imageAlt": "测试用抽象高斯点云校园画面",
+      "coveredByScene": true,
+      "viewId": "main-building"
+    },
+    {
+      "id": "campus-lake",
+      "order": 2,
+      "name": "校园湖畔",
+      "category": "自然风光",
+      "description": "景点资料占位。这里可介绍湖畔景观、四季变化及校园生活中的相关记忆。",
+      "image": "/campus-scan-placeholder.jpg",
+      "imageAlt": "测试用抽象校园湖畔画面",
+      "coveredByScene": true,
+      "viewId": "campus-lake"
+    },
+    {
+      "id": "learning-square",
+      "order": 3,
+      "name": "求知广场",
+      "category": "人文空间",
+      "description": "景点资料占位。正式资料可补充广场的空间特色、活动用途与校园文化故事。",
+      "image": "/campus-scan-placeholder.jpg",
+      "imageAlt": "测试用抽象校园广场画面",
+      "coveredByScene": true,
+      "viewId": "learning-square"
+    }
+  ]
+}

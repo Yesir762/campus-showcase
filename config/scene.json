@@ -1,0 +1,15 @@
+{
+  "activeVersion": "test-v1",
+  "versions": {
+    "test-v1": {
+      "label": "测试场景 v1",
+      "status": "test",
+      "format": "placeholder",
+      "desktopUrl": null,
+      "mobileUrl": null,
+      "poster": "/campus-scan-placeholder.jpg",
+      "modelNotice": "当前未检测到可用的 3DGS 模型，正在展示可交互的测试占位场景。",
+      "updatedAt": "2026-09-30"
+    }
+  }
+}
