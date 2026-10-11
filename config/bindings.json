@@ -1,24 +1,116 @@
 {
-  "sceneVersion": "test-v1",
+  "sceneVersion": "yujiatou-test-v2",
   "transform": {
-    "position": [0, 0, 0],
-    "rotation": [0, 0, 180],
-    "scale": [1, 1, 1]
+    "position": [
+      -1.4582948303222656,
+      1.4257320022583009,
+      0.7656942749023438
+    ],
+    "rotation": [
+      -90,
+      0,
+      0
+    ],
+    "scale": [
+      0.02,
+      0.02,
+      0.02
+    ]
   },
   "camera": {
-    "minDistance": 1.2,
-    "maxDistance": 18,
-    "initialViewId": "overview"
+    "minDistance": 1,
+    "maxDistance": 40,
+    "initialViewId": "overview",
+    "fov": 55,
+    "panMin": [
+      -6,
+      -2,
+      -7
+    ],
+    "panMax": [
+      6,
+      3,
+      7
+    ],
+    "splatBudget": 3000000
   },
   "views": [
-    { "id": "overview", "name": "校园全景", "camera": [0, 2.4, 8], "target": [0, 0, 0], "preview": { "x": 50, "y": 50, "scale": 1 } },
-    { "id": "main-building", "name": "校园主楼", "camera": [1.5, 1.2, 4.5], "target": [0.8, 0.2, 0], "preview": { "x": 58, "y": 47, "scale": 1.42 } },
-    { "id": "campus-lake", "name": "校园湖畔", "camera": [-2, 1.1, 4], "target": [-1.2, -0.2, 0], "preview": { "x": 35, "y": 68, "scale": 1.55 } },
-    { "id": "learning-square", "name": "求知广场", "camera": [0.5, 1.1, 3.8], "target": [0.4, -0.1, 0], "preview": { "x": 54, "y": 62, "scale": 1.7 } }
+    {
+      "id": "overview",
+      "name": "扫描全景",
+      "camera": [
+        8,
+        9,
+        12
+      ],
+      "target": [
+        0,
+        0,
+        0
+      ],
+      "preview": {
+        "x": 50,
+        "y": 50,
+        "scale": 1
+      }
+    },
+    {
+      "id": "north",
+      "name": "北侧俯瞰",
+      "camera": [
+        0,
+        8,
+        -11
+      ],
+      "target": [
+        0,
+        0,
+        0
+      ],
+      "preview": {
+        "x": 50,
+        "y": 50,
+        "scale": 1
+      }
+    },
+    {
+      "id": "south",
+      "name": "南侧俯瞰",
+      "camera": [
+        -7,
+        6,
+        9
+      ],
+      "target": [
+        0,
+        0,
+        0
+      ],
+      "preview": {
+        "x": 50,
+        "y": 50,
+        "scale": 1
+      }
+    },
+    {
+      "id": "detail",
+      "name": "建筑细节",
+      "camera": [
+        3,
+        4,
+        5
+      ],
+      "target": [
+        0,
+        0,
+        0
+      ],
+      "preview": {
+        "x": 50,
+        "y": 50,
+        "scale": 1
+      }
+    }
   ],
-  "markers": [
-    { "placeId": "main-building", "position": [0.9, 0.5, 0], "preview": { "x": 58, "y": 47 } },
-    { "placeId": "campus-lake", "position": [-1.1, 0, 0], "preview": { "x": 36, "y": 65 } },
-    { "placeId": "learning-square", "position": [0.2, 0, 0], "preview": { "x": 53, "y": 61 } }
-  ]
+  "markers": []
 }

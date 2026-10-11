@@ -45,3 +45,7 @@ tsconfig.tsbuildinfo
 /.codex/
 /outputs/
 /work/
+/*.zip
+/public/models/**/*.ply
+/public/models/**/*.sog
+/public/models/**/streamed/

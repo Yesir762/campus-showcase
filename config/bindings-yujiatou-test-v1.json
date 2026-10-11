@@ -1,0 +1,85 @@
+{
+  "sceneVersion": "yujiatou-test-v1",
+  "transform": {
+    "position": [
+      -1.4499598693847657,
+      1.4406544494628906,
+      0.7649765014648438
+    ],
+    "rotation": [
+      -90,
+      0,
+      0
+    ],
+    "scale": [
+      0.02,
+      0.02,
+      0.02
+    ]
+  },
+  "camera": {
+    "minDistance": 1,
+    "maxDistance": 40,
+    "initialViewId": "overview"
+  },
+  "views": [
+    {
+      "id": "overview",
+      "name": "扫描全景",
+      "camera": [
+        8,
+        9,
+        12
+      ],
+      "target": [
+        0,
+        0,
+        0
+      ],
+      "preview": {
+        "x": 50,
+        "y": 50,
+        "scale": 1
+      }
+    },
+    {
+      "id": "north",
+      "name": "北侧俯瞰",
+      "camera": [
+        0,
+        8,
+        -11
+      ],
+      "target": [
+        0,
+        0,
+        0
+      ],
+      "preview": {
+        "x": 50,
+        "y": 50,
+        "scale": 1
+      }
+    },
+    {
+      "id": "south",
+      "name": "南侧俯瞰",
+      "camera": [
+        -7,
+        6,
+        9
+      ],
+      "target": [
+        0,
+        0,
+        0
+      ],
+      "preview": {
+        "x": 50,
+        "y": 50,
+        "scale": 1
+      }
+    }
+  ],
+  "markers": []
+}

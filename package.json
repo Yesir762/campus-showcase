@@ -11,12 +11,16 @@
     "build": "node scripts/run-framework.mjs build",
     "start": "node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js dev --config dist/server/wrangler.json --local --persist-to .wrangler/state --ip 127.0.0.1 --inspector-port 0",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
-    "db:generate": "drizzle-kit generate"
-    ,"check:ply": "node scripts/check-ply.mjs"
+    "db:generate": "drizzle-kit generate",
+    "check:ply": "node scripts/check-ply.mjs",
+    "test:campus": "node --experimental-strip-types --test tests/*.test.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
+    "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^5.7.1",
+    "@hugeicons/core-free-icons": "^4.3.5",
+    "@hugeicons/react": "^1.1.10",
     "@shadcn/react": "^0.3.0",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
@@ -24,8 +28,10 @@
     "date-fns": "^4.4.0",
     "drizzle-orm": "0.45.2",
     "embla-carousel-react": "^8.6.0",
+    "gsap": "^3.15.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^1.31.0",
+    "motion": "^14.1.0",
     "next": "16.3.4",
     "next-themes": "^0.4.6",
     "playcanvas": "2.22.6",
@@ -44,6 +50,7 @@
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.37.1",
     "@cloudflare/workers-types": "4.20260515.1",
+    "@playcanvas/splat-transform": "3.8.0",
     "@tailwindcss/postcss": "4.2.1",
     "@types/node": "22.19.19",
     "@types/react": "19.2.14",

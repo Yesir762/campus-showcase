@@ -1,6 +1,16 @@
 {
-  "activeVersion": "test-v1",
+  "activeVersion": "yujiatou-test-v2",
   "versions": {
+    "yujiatou-test-v1": {
+      "label": "余家头校区 · 实测模型 LOD2",
+      "status": "test",
+      "format": "ply",
+      "desktopUrl": "/models/yujiatou-test-v1/campus-lod2.ply",
+      "mobileUrl": null,
+      "poster": "/campus-scan-placeholder.jpg",
+      "modelNotice": "大疆智图实测高斯模型，包含两个扫描分块、约 90 万个高斯点。点击后下载约 65 MB 模型，首次加载需要片刻。",
+      "updatedAt": "2026-09-30"
+    },
     "test-v1": {
       "label": "测试场景 v1",
       "status": "test",
@@ -10,6 +20,80 @@
       "poster": "/campus-scan-placeholder.jpg",
       "modelNotice": "当前未检测到可用的 3DGS 模型，正在展示可交互的测试占位场景。",
       "updatedAt": "2026-09-30"
+    },
+    "yujiatou-test-v2": {
+      "label": "余家头校区 · 分级高清预览",
+      "status": "test",
+      "format": "streamed-sog",
+      "desktopUrl": "/models/yujiatou-test-v2/streamed/lod-meta.json",
+      "mobileUrl": "/models/yujiatou-test-v2/campus-lod2.sog",
+      "poster": "/campus-scan-placeholder.jpg",
+      "modelNotice": "默认先加载校园概貌，再按观察距离补充高精度细节。也可选择固定高清、标准或轻量精度对照；高清版本约 88 MB，请按设备性能选择。",
+      "updatedAt": "2026-09-30",
+      "defaultVariant": "auto",
+      "variants": [
+        {
+          "id": "auto",
+          "label": "自动 · 按距离提升细节",
+          "url": "/models/yujiatou-test-v2/streamed/lod-meta.json",
+          "format": "streamed-sog",
+          "diagnostic": false
+        },
+        {
+          "id": "campus-lod0",
+          "label": "高清 · 完整扫描 LOD0",
+          "url": "/models/yujiatou-test-v2/campus-lod0.sog",
+          "format": "sog",
+          "diagnostic": false,
+          "bytes": 88233530,
+          "points": 7198758
+        },
+        {
+          "id": "campus-lod1",
+          "label": "标准 · 完整扫描 LOD1",
+          "url": "/models/yujiatou-test-v2/campus-lod1.sog",
+          "format": "sog",
+          "diagnostic": false,
+          "bytes": 44655391,
+          "points": 3592750
+        },
+        {
+          "id": "campus-lod2",
+          "label": "轻量 · 完整扫描 LOD2",
+          "url": "/models/yujiatou-test-v2/campus-lod2.sog",
+          "format": "sog",
+          "diagnostic": false,
+          "bytes": 11496720,
+          "points": 897910
+        },
+        {
+          "id": "block0-lod0",
+          "label": "高清 · 单分块对照 LOD0",
+          "url": "/models/yujiatou-test-v2/block0-lod0.sog",
+          "format": "sog",
+          "diagnostic": true,
+          "bytes": 44877879,
+          "points": 3625802
+        },
+        {
+          "id": "block0-lod1",
+          "label": "标准 · 单分块对照 LOD1",
+          "url": "/models/yujiatou-test-v2/block0-lod1.sog",
+          "format": "sog",
+          "diagnostic": true,
+          "bytes": 22762398,
+          "points": 1809411
+        },
+        {
+          "id": "block0-lod2",
+          "label": "轻量 · 单分块对照 LOD2",
+          "url": "/models/yujiatou-test-v2/block0-lod2.sog",
+          "format": "sog",
+          "diagnostic": true,
+          "bytes": 5828425,
+          "points": 452348
+        }
+      ]
     }
   }
 }

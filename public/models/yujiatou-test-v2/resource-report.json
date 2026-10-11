@@ -1,0 +1,189 @@
+{
+  "version": "yujiatou-test-v2",
+  "converter": "@playcanvas/splat-transform@3.8.0",
+  "resources": [
+    {
+      "scope": "block0",
+      "lod": 2,
+      "url": "/models/yujiatou-test-v2/block0-lod2.sog",
+      "bytes": 5828425,
+      "sha256": "a230bf1caed1248d9ec31dfc89ce369d2a8de606e4c3c3e76946d241aa45590a",
+      "vertices": 452348,
+      "bounds": {
+        "min": [
+          -181.0215606689453,
+          -260.591796875,
+          -94.0050277709961
+        ],
+        "max": [
+          326.0175476074219,
+          45.73948669433594,
+          -50.53396224975586
+        ]
+      },
+      "sources": [
+        {
+          "source": "work/model-import/3dgs/results/3dgs_ply/Block000/LOD2/point_cloud.ply",
+          "vertices": 452348,
+          "payloadSha256": "0f07a86486612fc12e47ed0e0643716f292283ef4e9f14fd464034477e897b1e"
+        }
+      ],
+      "note": "SOG quantization; no point decimation or coordinate transformation applied."
+    },
+    {
+      "scope": "block0",
+      "lod": 1,
+      "url": "/models/yujiatou-test-v2/block0-lod1.sog",
+      "bytes": 22762398,
+      "sha256": "83e44a651267f5cf5924680e88cbeb027b865bf6755ca122c787d50588a63cba",
+      "vertices": 1809411,
+      "bounds": {
+        "min": [
+          -181.05247497558594,
+          -260.68267822265625,
+          -94.0050277709961
+        ],
+        "max": [
+          326.8804931640625,
+          45.73976516723633,
+          -50.53396224975586
+        ]
+      },
+      "sources": [
+        {
+          "source": "work/model-import/3dgs/results/3dgs_ply/Block000/LOD1/point_cloud.ply",
+          "vertices": 1809411,
+          "payloadSha256": "ed80ab17c38cfca8937b736541cf71964d950b7773067df65c278bd7ef030fbf"
+        }
+      ],
+      "note": "SOG quantization; no point decimation or coordinate transformation applied."
+    },
+    {
+      "scope": "block0",
+      "lod": 0,
+      "url": "/models/yujiatou-test-v2/block0-lod0.sog",
+      "bytes": 44877879,
+      "sha256": "ac2316f895dcf5bd26914e302f292bcc5c1687902fcccba6168df92d3734ea5d",
+      "vertices": 3625802,
+      "bounds": {
+        "min": [
+          -181.04920959472656,
+          -260.6754150390625,
+          -94.10786437988281
+        ],
+        "max": [
+          326.8786926269531,
+          45.739742279052734,
+          -50.52712631225586
+        ]
+      },
+      "sources": [
+        {
+          "source": "work/model-import/3dgs/results/3dgs_ply/Block000/LOD0/point_cloud.ply",
+          "vertices": 3625802,
+          "payloadSha256": "e98935bf7bd74c773b505d77b8800336eb0f1db1bf29e17500a2a1e2239ec64c"
+        }
+      ],
+      "note": "SOG quantization; no point decimation or coordinate transformation applied."
+    },
+    {
+      "scope": "campus",
+      "lod": 2,
+      "url": "/models/yujiatou-test-v2/campus-lod2.sog",
+      "bytes": 11496720,
+      "sha256": "e996673123114f29a21b8c2287bee5bcce81fd1acdbce4975a06a28230799258",
+      "vertices": 897910,
+      "bounds": {
+        "min": [
+          -181.0215606689453,
+          -260.591796875,
+          -95.14801788330078
+        ],
+        "max": [
+          326.0175476074219,
+          337.0894470214844,
+          -48.91742706298828
+        ]
+      },
+      "sources": [
+        {
+          "source": "work/model-import/3dgs/results/3dgs_ply/Block000/LOD2/point_cloud.ply",
+          "vertices": 452348,
+          "payloadSha256": "0f07a86486612fc12e47ed0e0643716f292283ef4e9f14fd464034477e897b1e"
+        },
+        {
+          "source": "work/model-import/3dgs/results/3dgs_ply/Block001/LOD2/point_cloud.ply",
+          "vertices": 445562,
+          "payloadSha256": "2895d1fbb3b3a0c15c2724e9e08198e1e15df57f6196740f1415e9dd725ce75a"
+        }
+      ],
+      "note": "SOG quantization; no point decimation or coordinate transformation applied."
+    },
+    {
+      "scope": "campus",
+      "lod": 1,
+      "url": "/models/yujiatou-test-v2/campus-lod1.sog",
+      "bytes": 44655391,
+      "sha256": "977815883eddd6ac31425497874dff53c1c3309844d95be72fca7da27c17cfa5",
+      "vertices": 3592750,
+      "bounds": {
+        "min": [
+          -181.05247497558594,
+          -260.68267822265625,
+          -95.2562255859375
+        ],
+        "max": [
+          326.8804931640625,
+          337.1459655761719,
+          -48.37480926513672
+        ]
+      },
+      "sources": [
+        {
+          "source": "work/model-import/3dgs/results/3dgs_ply/Block000/LOD1/point_cloud.ply",
+          "vertices": 1809411,
+          "payloadSha256": "ed80ab17c38cfca8937b736541cf71964d950b7773067df65c278bd7ef030fbf"
+        },
+        {
+          "source": "work/model-import/3dgs/results/3dgs_ply/Block001/LOD1/point_cloud.ply",
+          "vertices": 1783339,
+          "payloadSha256": "810849660811a16b5c3f967150aaa91ccb85558c5f4e3234cbaa5430bc6101ad"
+        }
+      ],
+      "note": "SOG quantization; no point decimation or coordinate transformation applied."
+    },
+    {
+      "scope": "campus",
+      "lod": 0,
+      "url": "/models/yujiatou-test-v2/campus-lod0.sog",
+      "bytes": 88233530,
+      "sha256": "eccffc812fedc88f8bbcfc3ab8dfd2d5a7addfaa09a9c43064c9c0885674bd10",
+      "vertices": 7198758,
+      "bounds": {
+        "min": [
+          -181.04920959472656,
+          -260.6754150390625,
+          -95.25775909423828
+        ],
+        "max": [
+          326.8786926269531,
+          337.2448425292969,
+          -47.3154411315918
+        ]
+      },
+      "sources": [
+        {
+          "source": "work/model-import/3dgs/results/3dgs_ply/Block000/LOD0/point_cloud.ply",
+          "vertices": 3625802,
+          "payloadSha256": "e98935bf7bd74c773b505d77b8800336eb0f1db1bf29e17500a2a1e2239ec64c"
+        },
+        {
+          "source": "work/model-import/3dgs/results/3dgs_ply/Block001/LOD0/point_cloud.ply",
+          "vertices": 3572956,
+          "payloadSha256": "80b86141a7d51a10144073c5a678153a03ee467c640db71a2be26b2c67d41c72"
+        }
+      ],
+      "note": "SOG quantization; no point decimation or coordinate transformation applied."
+    }
+  ]
+}
