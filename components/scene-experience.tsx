@@ -1,6 +1,6 @@
 'use client';
 import {useCallback,useEffect,useRef,useState} from 'react';
-import {Expand,Shrink,Focus,Compass,X,Rotate3D,MousePointer2} from 'lucide-react';
+import {Expand,Shrink,Focus,Compass,X,Rotate3D,MousePointer2,LogOut} from 'lucide-react';
 import {Button} from '@/components/ui/button';
 import {Progress} from '@/components/ui/progress';
 import type {SceneVersion,SceneBindings,SceneDefinition} from '@/lib/campus-config';
@@ -85,7 +85,7 @@ export function SceneExperience({scene,bindings,definition}:{scene:SceneVersion;
    </div>
    {error&&<p role="alert" className={styles.performanceInfo}>{error}</p>}
    {metrics&&<details className={styles.performanceInfo}><summary>模型运行信息</summary><p>首次可交互：{metrics.loadSeconds.toFixed(1)} 秒；近 60 秒中位帧率：{Math.round(metrics.medianFps)} FPS；浏览时长：{Math.round(metrics.elapsedSeconds)} 秒。{metrics.resolutionReduced?'已降低渲染分辨率。':''}</p>{diagnostic&&<p>相机：{metrics.camera.join(', ')}；观察目标：{metrics.target.join(', ')}</p>}<p>本地记录不能替代正式设备、网络与内存验收。</p></details>}
-   {state==='ready'&&<p className={styles.performanceInfo}>{metrics?.suggestFallback?'设备持续较慢，可选择轻量精度或退出。':''}<button onClick={()=>{stop();setSelected(null);setFullscreen(false);setState('idle');}}>退出三维浏览</button></p>}
+   {state==='ready'&&<div className={styles.modelExitActions}><button type="button" className={styles.modelExitButton} onClick={()=>{stop();setSelected(null);setFullscreen(false);setState('idle');}}><LogOut aria-hidden="true"/><span>退出三维浏览</span></button>{metrics?.suggestFallback&&<span className={styles.modelExitHint}>设备持续较慢，可选择轻量精度或退出。</span>}</div>}
    <p className={styles.performanceInfo}>{walk?'电脑：WASD 移动、鼠标拖动观察、方向键转向；手机：左侧摇杆移动、右侧滑动观察。':'电脑：拖动旋转、右键平移、滚轮缩放；手机：单指旋转、双指缩放和平移。'} {scene.mobileUrl?`手机资源：${mobileLabel}。`:'手机未配置轻量资源时使用图文浏览。'}</p>
   </section>
   <section data-motion-section id="places" className={styles.placesSection}><div className={styles.placesIntro}><SectionTitle english="STORIES"/><div data-motion-copy><p className={styles.kicker}>{walk?'展区与展品':'相关图文'}</p><h2>{walk?'在展厅里，发现故事':'每一处风景，都有故事'}</h2><p>介绍和照片独立于模型维护，未确认内容明确标示为占位资料。</p></div></div><div className={styles.placeList}>{[...definition.content].sort((a,b)=>a.order-b.order).map(c=><article data-motion-card className={styles.placeCard} key={c.id}><button data-image-reveal className={styles.cardImage} onClick={()=>selectPlace(c.id)} aria-label={`查看${c.name}介绍`}><div className={styles.parallaxLayer} data-parallax><img src={c.image} alt={c.imageAlt}/></div><span>{String(c.order).padStart(2,'0')}</span></button><div className={styles.cardCopy}><p>{c.category}</p><h3>{c.name}</h3><span>{c.description}</span><button onClick={()=>selectPlace(c.id)}>{bindings.locations.some(l=>l.placeId===c.id)?'在三维中定位':'查看介绍'} →</button></div></article>)}</div></section>

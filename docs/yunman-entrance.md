@@ -9,3 +9,5 @@
 验证：类型检查、生产构建；桌面新访问、空白处点击、刷新不重复、进入后 Canvas 移除和滚动恢复；键盘 Space 进入及锚点定位。手机布局使用浏览器尺寸模拟验证，实际手机触摸、存储受限和系统减少动态效果仍需实机检查。
 
 像素过渡使用固定内联 SVG 遮罩，矩形仅初始化一次，最多 30 FPS、768 格。分解期间冻结 TechText 并保留输入隔离；后台切换立即结束，窗口或视觉视口尺寸变化直接完成退出，避免像素重新出现。新增网格覆盖、格数预算、确定性顺序及结束透明测试。13 项测试、类型检查与构建通过；浏览器已验证鼠标进入、键盘 Enter、390px 布局、开场移除与刷新规则。减少动态效果、遮罩不可用与实际手机触控仍需专项设备检查。
+
+Current Safari-compatible renderer: CSS clip-path:path(...) geometric pixel shrinking replaces the fixed inline SVG mask. Timing and session entry rules are unchanged. Verification is recorded in docs/safari-pixel-diagnosis.md.

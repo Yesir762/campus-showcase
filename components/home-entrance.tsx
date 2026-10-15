@@ -1,24 +1,23 @@
 'use client';
-import {useCallback,useEffect,useId,useLayoutEffect,useRef,useState} from 'react';
+import {useCallback,useEffect,useLayoutEffect,useRef,useState} from 'react';
 import type {ReactNode,ComponentType} from 'react';
 import type {TechTextProps} from './react-bits/TechText';
 import styles from './home-entrance.module.css';
+import {BrandIcon} from './brand-icon';
 import gsap from 'gsap';
 import {useGSAP} from '@gsap/react';
-import {MotionReadyContext,MotionPlayingContext,SkipHeroEntranceContext} from './campus-motion';
-import {pixelGrid,pixelRect} from '@/lib/pixel-dissolve';
+import {MotionReadyContext,MotionPlayingContext} from './campus-motion';
+import {pixelGrid,pixelClipPath} from '@/lib/pixel-dissolve';
 const sessionKey='yunman-wuli:entered:v1';
 let enteredInMemory=false;
 export function HomeEntrance({children}:{children:ReactNode}) {
  const [show,setShow]=useState(true),[leaving,setLeaving]=useState(false),[ready,setReady]=useState(false),[transitioning,setTransitioning]=useState(false);
  const [reduced,setReduced]=useState(true),[mobile,setMobile]=useState(false);
  const [openingDone,setOpeningDone]=useState(false);
- const [skipHeroEntrance,setSkipHeroEntrance]=useState(false);
  const [wordSize,setWordSize]=useState<number|undefined>();
  const opening=useRef<gsap.core.Timeline|null>(null);
  const [Visual,setVisual]=useState<ComponentType<TechTextProps>|null>(null);
- const maskId=`entrance-pixels-${useId().replace(/[^a-zA-Z0-9_-]/g,'')}`;
- const mask=useRef<SVGMaskElement>(null),maskCells=useRef<SVGGElement>(null),finished=useRef(false);
+ const finished=useRef(false);
  const cancelTransition=useRef<()=>void>(()=>{});
  const gate=useRef<HTMLDivElement>(null),content=useRef<HTMLDivElement>(null),timer=useRef<ReturnType<typeof setTimeout>|undefined>(undefined),entering=useRef(false);
  useLayoutEffect(()=>{
@@ -66,7 +65,7 @@ export function HomeEntrance({children}:{children:ReactNode}) {
  const finish=useCallback(()=>{
   if(finished.current)return;
   finished.current=true;
-  // Hide before removing the mask so cleanup cannot restore the entrance for a frame.
+  // Hide before removing the clip so cleanup cannot restore the entrance for a frame.
   if(gate.current)gate.current.style.visibility='hidden';
   cancelTransition.current();
   clearTimeout(timer.current);
@@ -82,7 +81,7 @@ export function HomeEntrance({children}:{children:ReactNode}) {
  const enter=useCallback((point?:{x:number;y:number})=>{
   if(entering.current)return;
   // Freeze the current opening frame. Reverting or completing it here causes a visible jump.
-  entering.current=true;setSkipHeroEntrance(true);opening.current?.pause();enteredInMemory=true;
+  entering.current=true;opening.current?.pause();enteredInMemory=true;
   try {sessionStorage.setItem(sessionKey,'1');} catch {}
   if(reduced){finish();return;}
   setTransitioning(true);
@@ -93,13 +92,12 @@ export function HomeEntrance({children}:{children:ReactNode}) {
    clearTimeout(timer.current);cancelTransition.current();
    setLeaving(true);timer.current=setTimeout(finish,350);
   };
-  if(!element||!mask.current||!maskCells.current||
-   !CSS.supports('mask-image',`url("#${maskId}")`)&&!CSS.supports('-webkit-mask-image',`url("#${maskId}")`)){fallback();return;}
+  const probe='path("M0 0H1V1H0Z")';
+  if(!element||!CSS.supports('clip-path',probe)&&!CSS.supports('-webkit-clip-path',probe)){fallback();return;}
   const initial=element.getBoundingClientRect(),width=initial.width,height=initial.height;
   if(width<=0||height<=0){fallback();return;}
   const origin={x:point?Math.min(width,Math.max(0,point.x-initial.left)):width/2,y:point?Math.min(height,Math.max(0,point.y-initial.top)):height/2};
   const small=mobile||matchMedia('(max-width:600px)').matches,duration=small?700:900;
-  const group=maskCells.current,maskElement=mask.current;
   const onHidden=()=>{if(document.hidden)finish();};
   const onReduce=(event:MediaQueryListEvent)=>{if(event.matches)finish();};
   const media=matchMedia('(prefers-reduced-motion: reduce)');
@@ -108,24 +106,16 @@ export function HomeEntrance({children}:{children:ReactNode}) {
    cancelAnimationFrame(raf);
    document.removeEventListener('visibilitychange',onHidden);media.removeEventListener('change',onReduce);
    window.removeEventListener('resize',onResize);window.visualViewport?.removeEventListener('resize',onResize);
-   element.style.maskImage='';element.style.webkitMaskImage='';group.replaceChildren();
+   element.style.clipPath='';element.style.removeProperty('-webkit-clip-path');
    cancelTransition.current=()=>{};
   };
   try{
    const cells=pixelGrid(width,height,origin,small);
-   maskElement.setAttribute('width',String(width));maskElement.setAttribute('height',String(height));
-   const rectangles=cells.map(cell=>{
-    const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
-    rect.setAttribute('fill','white');group.appendChild(rect);return {cell,rect};
-   });
-   const draw=(progress:number)=>rectangles.forEach(({cell,rect})=>{
-    const bounds=pixelRect(cell,progress);
-    for(const [attribute,value] of Object.entries(bounds))rect.setAttribute(attribute,String(value));
-   });
-   draw(0);
-   // The resource stays the same for the entire transition; only its rectangles change.
-   const image=`url("#${maskId}")`;
-   element.style.maskImage=image;element.style.webkitMaskImage=image;applied=true;
+   const draw=(progress:number)=>{
+    const clip=pixelClipPath(cells,progress);
+    element.style.clipPath=clip;element.style.setProperty('-webkit-clip-path',clip);
+   };
+   draw(0);applied=true;
    document.addEventListener('visibilitychange',onHidden);media.addEventListener('change',onReduce);
    window.addEventListener('resize',onResize);window.visualViewport?.addEventListener('resize',onResize);
    const start=performance.now();
@@ -141,10 +131,9 @@ export function HomeEntrance({children}:{children:ReactNode}) {
    };
    timer.current=setTimeout(finish,duration+150);raf=requestAnimationFrame(tick);
   }catch{fallback();}
- },[reduced,mobile,finish,maskId]);
+ },[reduced,mobile,finish]);
 
- return <MotionReadyContext.Provider value={!show||transitioning}><MotionPlayingContext.Provider value={!show}><SkipHeroEntranceContext.Provider value={skipHeroEntrance}>
-  {show&&<svg aria-hidden="true" focusable="false" width="0" height="0" style={{position:'absolute',pointerEvents:'none'}}><defs><mask ref={mask} id={maskId} maskUnits="userSpaceOnUse" maskContentUnits="userSpaceOnUse" x="0" y="0" style={{maskType:'alpha'}}><g ref={maskCells}/></mask></defs></svg>}
+ return <MotionReadyContext.Provider value={!show||transitioning}><MotionPlayingContext.Provider value={!show}>
   <div ref={content} inert={show} aria-hidden={show||undefined}>{children}</div>
   {show&&<div ref={gate} className={`${styles.entrance} ${leaving?styles.leaving:''} ${transitioning?styles.transitioning:''}`} role="dialog" aria-modal="true" aria-labelledby="entrance-title" tabIndex={-1} onClick={e=>enter(e.detail?{x:e.clientX,y:e.clientY}:undefined)} onKeyDown={e=>{
    if(e.key==='Enter'||e.key===' '){e.preventDefault();enter();}
@@ -152,12 +141,12 @@ export function HomeEntrance({children}:{children:ReactNode}) {
   }}>
    <div data-opening data-opening-grid className={styles.grid} aria-hidden="true"/>
    <svg data-opening data-opening-contours className={styles.contours} viewBox="0 0 1400 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g fill="none" stroke="currentColor" strokeWidth="1">{Array.from({length:10},(_,i)=><ellipse key={i} cx="1150" cy="740" rx={220+i*65} ry={110+i*45} transform="rotate(-22 1150 740)"/>)}</g></svg>
-   <div data-opening data-opening-school className={styles.school}><span className={styles.schoolMark} aria-hidden="true">云</span><span>武汉理工大学<small>余家头校区 · 数字校园</small></span></div>
+   <div data-opening data-opening-school className={styles.school}><span className={styles.schoolMark} aria-hidden="true"><BrandIcon/></span><span>武汉理工大学<small>余家头校区 · 数字校园</small></span></div>
    <div className={styles.center}><p data-opening data-opening-copy className={styles.eyebrow}>CAMPUS IN THE CLOUD</p><div className={styles.wordmark}>
     <h1 id="entrance-title" className={!reduced&&ready&&Visual&&openingDone?styles.hiddenTitle:styles.staticTitle} style={wordSize?{fontSize:wordSize}:undefined}>{Array.from('云漫武理').map(char=><span className={styles.glyphClip} key={char}><span data-opening data-opening-glyph>{char}</span></span>)}</h1>
     {!reduced&&Visual&&<div className={styles.canvasLayer} aria-hidden="true" style={{opacity:ready&&openingDone?1:0}}><Visual text="云漫武理" paused={transitioning||!openingDone} fontFamily='"PingFang SC", "Microsoft YaHei", sans-serif' fontWeight={600} fontSize={180} letterSpacing={.06} color="#005bac" accentColor="#1677d2" reveal="letter" dashLength={4} dashGap={2} strokeWidth={1.5} specks={mobile?4:8} selection labels={false} draggable={false} sweep speed={.7} onReady={layout=>{if(!entering.current){setWordSize(layout.fontSize);setReady(true);}}}/></div>}
    </div><p data-opening data-opening-copy className={styles.tagline}>让校园风景，触手可及</p><div className={styles.divider}/><button type="button" data-opening data-opening-copy className={styles.enter}><span className={styles.enterDot} aria-hidden="true"/>点击任意位置，开启校园之旅<span aria-hidden="true">↗</span></button></div>
    <div data-opening data-opening-copy className={styles.footer}><span>主校区 · 航海楼 · 航海博物馆</span><span>云漫武理 / 校园风光测试预览</span></div>
   </div>}
- </SkipHeroEntranceContext.Provider></MotionPlayingContext.Provider></MotionReadyContext.Provider>;
+ </MotionPlayingContext.Provider></MotionReadyContext.Provider>;
 }

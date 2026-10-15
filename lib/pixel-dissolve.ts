@@ -17,3 +17,16 @@ export function pixelRect(cell:PixelCell,progress:number){
  const width=(cell.width+1)*remaining,height=(cell.height+1)*remaining;
  return {x:cell.x+(cell.width-width)/2,y:cell.y+(cell.height-height)/2,width,height,opacity:remaining};
 }
+// Direct CSS geometry avoids Safari's cross-element SVG mask repaint path.
+export function pixelClipPath(cells:PixelCell[],progress:number):string{
+ const paths=cells.map(cell=>{
+  const rect=pixelRect(cell,progress);
+  if(rect.width<=0||rect.height<=0)return '';
+  const x=rect.x.toFixed(2),y=rect.y.toFixed(2);
+  const right=(rect.x+rect.width).toFixed(2),bottom=(rect.y+rect.height).toFixed(2);
+  return `M${x} ${y}H${right}V${bottom}H${x}Z`;
+ }).join('');
+ // A valid zero-area path keeps the fully dissolved state clipped, rather than
+ // falling back to `none` and showing the entire entrance again.
+ return `path("${paths||'M0 0Z'}")`;
+}

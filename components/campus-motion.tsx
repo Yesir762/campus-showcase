@@ -8,7 +8,6 @@ import styles from '@/app/page.module.css';
 gsap.registerPlugin(ScrollTrigger,useGSAP);
 export const MotionReadyContext=createContext(true);
 export const MotionPlayingContext=createContext(true);
-export const SkipHeroEntranceContext=createContext(false);
 export function CampusTitle({text}:{text:string}) {
  return <h1 className={styles.motionTitle}>{text.split('\n').map(line=><span className={styles.lineMask} key={line}><span data-hero-line>{line}</span></span>)}</h1>;
 }
@@ -19,8 +18,10 @@ export function Reveal({children,delay=0}:{children:ReactNode;delay?:number}) {
  return <div data-motion-card data-motion-delay={delay}>{children}</div>;
 }
 export function CreativeMotion({children}:{children:ReactNode}) {
- const scope=useRef<HTMLDivElement>(null),ready=useContext(MotionReadyContext),playing=useContext(MotionPlayingContext),skipHeroEntrance=useContext(SkipHeroEntranceContext);
- const heroTimeline=useRef<gsap.core.Timeline|null>(null);
+ const scope=useRef<HTMLDivElement>(null),ready=useContext(MotionReadyContext),playing=useContext(MotionPlayingContext);
+ const heroTimeline=useRef<gsap.core.Timeline|null>(null),playingRef=useRef(playing);
+ // Media-query rebuilds must use the current playback state, not the click-time closure.
+ useLayoutEffect(()=>{playingRef.current=playing;},[playing]);
  useGSAP(()=>{
   const root=scope.current;if(!root||!ready)return;
   const media=gsap.matchMedia();
@@ -36,18 +37,14 @@ export function CreativeMotion({children}:{children:ReactNode}) {
    const timelines:{section:HTMLElement;tl:gsap.core.Timeline}[]=[];
    const hero=root.querySelector<HTMLElement>('[data-hero]');
    if(hero&&!location.hash){
-    // Under the dissolving entrance, animate the headline immediately while keeping
-    // the photo, navigation and copy visible. Normal revisits keep the full intro.
-    const tl=gsap.timeline({paused:skipHeroEntrance?false:!playing,defaults:{ease:'power4.out',duration:1.2*factor}});
+    // Prepare once beneath the opaque entrance; keep the whole intro paused until
+    // the pixel overlay is removed, then continue this same timeline from its start.
+    const tl=gsap.timeline({paused:!playingRef.current,defaults:{ease:'power4.out',duration:1.2*factor}});
     heroTimeline.current=tl;
-    if(skipHeroEntrance){
-     tl.fromTo(hero.querySelectorAll('[data-hero-line]'),{yPercent:110,scaleY:.82},{yPercent:0,scaleY:1,stagger:.16,clearProps:'transform'},0);
-    }else{
-     tl.fromTo(hero.querySelector('[data-hero-image]'),{clipPath:'inset(100% 0 0 0)',scale:1.1},{clipPath:'inset(0% 0 0 0)',scale:1,duration:1.8*factor,clearProps:'clipPath,transform'},0)
-      .fromTo(hero.querySelectorAll('[data-hero-line]'),{yPercent:110,scaleY:.82},{yPercent:0,scaleY:1,stagger:.16,clearProps:'transform'},.18)
-      .fromTo(root.querySelector('[data-motion-header]'),{y:-28,opacity:0},{y:0,opacity:1,clearProps:'transform,opacity'},.3)
-      .fromTo(hero.querySelectorAll('[data-hero-copy]'),{y:40,opacity:0},{y:0,opacity:1,stagger:.14,clearProps:'transform,opacity'},.55);
-    }
+    tl.fromTo(hero.querySelector('[data-hero-image]'),{clipPath:'inset(100% 0 0 0)',scale:1.1},{clipPath:'inset(0% 0 0 0)',scale:1,duration:1.8*factor,clearProps:'clipPath,transform'},0)
+     .fromTo(hero.querySelectorAll('[data-hero-line]'),{yPercent:110,scaleY:.82},{yPercent:0,scaleY:1,stagger:.16,clearProps:'transform'},.18)
+     .fromTo(root.querySelector('[data-motion-header]'),{y:-28,opacity:0},{y:0,opacity:1,clearProps:'transform,opacity'},.3)
+     .fromTo(hero.querySelectorAll('[data-hero-copy]'),{y:40,opacity:0},{y:0,opacity:1,stagger:.14,clearProps:'transform,opacity'},.55);
     timelines.push({section:hero,tl});
     ScrollTrigger.create({trigger:hero,start:'bottom top',onEnter:()=>tl.progress(1)});
    }
@@ -80,7 +77,7 @@ export function CreativeMotion({children}:{children:ReactNode}) {
    return()=>{observer.disconnect();root.removeEventListener('focusin',focus);document.removeEventListener('visibilitychange',hidden);};
   });}catch{media.revert();gsap.set(root.querySelectorAll('[data-motion-title],[data-motion-copy],[data-motion-card],[data-image-reveal],[data-hero-line],[data-hero-image],[data-hero-copy],[data-motion-header]'),{clearProps:'transform,opacity,clipPath,visibility'});}
   return()=>{heroTimeline.current=null;alive=false;resizeObserver.disconnect();cancelAnimationFrame(refreshFrame);images.forEach(image=>image.removeEventListener('load',refresh));media.revert();};
- },{scope,dependencies:[ready,skipHeroEntrance],revertOnUpdate:true});
+ },{scope,dependencies:[ready],revertOnUpdate:true});
  useLayoutEffect(()=>{if(playing)heroTimeline.current?.play();},[playing,ready]);
  return <div ref={scope}>{children}</div>;
 }

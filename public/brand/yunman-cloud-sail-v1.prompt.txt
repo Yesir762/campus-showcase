@@ -1,0 +1,9 @@
+Generated with built-in image_gen. Use case: logo-brand.
+
+Use case: logo-brand
+Asset type: minimalist website brand icon for 云漫武理, a Wuhan University of Technology digital campus exploration website.
+Primary request: Design one elegant original compact icon integrating a cloud and a sailing ship into ONE cohesive silhouette. Take inspiration from the university emblem's abstract sailing-ship idea, without reproducing the official seal. A broad soft cloud contour forms the upper silhouette, two crisp geometric sails are integrated through clean negative-space cuts within the cloud, a simple shallow boat hull below finishes the symbol. Make the cloud and ship equally readable. Prioritize beautiful proportions and strong simplicity at favicon size.
+Style/medium: flat vector-like graphic, sophisticated minimal identity, clean mathematically smooth curves, bold substantial shapes, restrained negative space.
+Color palette: single solid university blue #005bac, no other colors.
+Composition/framing: square canvas, exactly one centered isolated symbol, generous clear margins, symbol occupies about 72 percent of canvas width. Genuine transparent background.
+Constraints: no text, no letters, no seal rings, no fine details, no gradients, no shading, no 3D, no mockup, no border, no watermark, no presentation board, no multiple variants. A production-ready single logo icon.

@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {pixelGrid,pixelRect} from '../lib/pixel-dissolve.ts';
+import {pixelGrid,pixelRect,pixelClipPath} from '../lib/pixel-dissolve.ts';
 test('grid covers the viewport within the cell budget at desktop and mobile sizes',()=>{
  for(const [w,h,mobile] of [[1456,1034,false],[390,844,true],[844,390,true],[7680,4320,false]] as const){
   const cells=pixelGrid(w,h,{x:0,y:0},mobile);
@@ -29,5 +29,20 @@ test('each pixel shrinks inward with non-increasing opacity and never reappears'
    }
    assert.equal(previous.width,0);assert.equal(previous.height,0);assert.equal(previous.opacity,0);
   }
+ }
+});
+test('direct clip geometry covers each initial cell and ends with a valid empty path',()=>{
+ const cells=pixelGrid(960,480,{x:0,y:0},false);
+ const initial=pixelClipPath(cells,0);
+ assert.equal((initial.match(/M/g)||[]).length,cells.length);
+ assert.ok(initial.startsWith('path("M-0.50 -0.50'));
+ assert.equal(pixelClipPath(cells,1),'path("M0 0Z")');
+ assert.equal(pixelClipPath([],0),'path("M0 0Z")');
+ assert.ok(!initial.includes('url('));
+ let count=cells.length;
+ for(let frame=1;frame<=100;frame++){
+  const clip=pixelClipPath(cells,frame/100);
+  const next=clip==='path("M0 0Z")'?0:(clip.match(/M/g)||[]).length;
+  assert.ok(next<=count);count=next;
  }
 });

@@ -21,3 +21,11 @@ GSAP matchMedia 增加始终匹配条件，确保普通桌面在未匹配手机�
 初始化失败在尚未应用遮罩时淡出；应用遮罩后出现异常直接退出。退出先隐藏开场再清理遮罩，避免恢复完整开场一帧。窗口或视觉视口尺寸变化直接退出，不重新生成网格。重复结束调用不会重新安排焦点定时器。
 
 验证记录见 docs/pixel-dissolve-verification.md；纯函数测试覆盖每个像素尺寸、边界和透明度的单调性，不能替代浏览器合成验证。
+
+## 2026-10-11：顺序播放像素退出与完整首屏入场（当前行为）
+
+按用户确认改为顺序播放。点击开场时准备并暂停完整首屏时间线；分解期间露出固定的首屏底色，图片、大字、导航与说明保持入场初始值。开场移除后播放同一条时间线，恢复原有图片揭示、逐行大字、导航与说明编排。删除 SkipHeroEntranceContext 及分解期间提前播放大字的分支，保留 MotionReadyContext / MotionPlayingContext。媒体查询重建读取当前播放状态，避免退出后调整窗口导致首屏再次停在隐藏初始帧。固定 SVG 遮罩及异常防闪回清理保持不变。
+
+## Safari transition compatibility (current behavior)
+
+The fullscreen pixel transition now directly updates CSS clip-path geometry instead of referencing an SVG mask. This avoids the Safari repaint issue reproduced on the actual entrance. Pixel blocks shrink geometrically without the previous per-cell SVG alpha fade. The complete hero timeline still begins only after the entrance is removed. Safari mouse, Enter and Space verification passed; see docs/safari-pixel-diagnosis.md.
