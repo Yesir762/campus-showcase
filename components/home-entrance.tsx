@@ -4,8 +4,8 @@ import type {ReactNode,ComponentType} from 'react';
 import type {TechTextProps} from './react-bits/TechText';
 import styles from './home-entrance.module.css';
 import {BrandIcon} from './brand-icon';
-import gsap from 'gsap';
-import {useGSAP} from '@gsap/react';
+import type gsap from 'gsap';
+import {loadMotion} from '@/lib/motion-client';
 import {MotionReadyContext,MotionPlayingContext} from './campus-motion';
 import {pixelGrid,pixelClipPath} from '@/lib/pixel-dissolve';
 const sessionKey='yunman-wuli:entered:v1';
@@ -45,11 +45,13 @@ export function HomeEntrance({children}:{children:ReactNode}) {
   gate.current?.focus({preventScroll:true});
   return()=>{document.body.style.overflow=overflow;};
  },[show]);
- useGSAP(()=>{
+ useLayoutEffect(()=>{
   if(!show)return;
   const el=gate.current;if(!el)return;
   if(reduced){setOpeningDone(true);return;}
   setOpeningDone(false);
+  let active=true,context:gsap.Context|undefined;
+  loadMotion().then(({gsap})=>{if(!active||entering.current)return;context=gsap.context(()=>{
   try {
    const tl=gsap.timeline({defaults:{ease:'power4.out'},onComplete:()=>{setOpeningDone(true);gsap.set(el.querySelectorAll('[data-opening]'),{clearProps:'transform,opacity,clipPath'});}});
    opening.current=tl;
@@ -60,7 +62,9 @@ export function HomeEntrance({children}:{children:ReactNode}) {
     .fromTo(el.querySelectorAll('[data-opening-copy]'),{y:24,opacity:0},{y:0,opacity:1,duration:.9,stagger:.12},1.05);
    return()=>{tl.kill();opening.current=null;};
   }catch{setOpeningDone(true);gsap.set(el.querySelectorAll('[data-opening]'),{clearProps:'all'});}
- },{scope:gate,dependencies:[show,reduced],revertOnUpdate:true});
+  },gate);}).catch(()=>{if(active)setOpeningDone(true);});
+  return()=>{active=false;context?.revert();};
+ },[show,reduced]);
  useEffect(()=>()=>{clearTimeout(timer.current);cancelTransition.current();},[]);
  const finish=useCallback(()=>{
   if(finished.current)return;

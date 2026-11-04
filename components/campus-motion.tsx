@@ -1,11 +1,10 @@
 'use client';
 import {createContext,useContext,useLayoutEffect,useRef} from 'react';
 import type {ReactNode} from 'react';
-import gsap from 'gsap';
-import {ScrollTrigger} from 'gsap/ScrollTrigger';
-import {useGSAP} from '@gsap/react';
+import type gsap from 'gsap';
+import {loadMotion} from '@/lib/motion-client';
+import type {ScrollTrigger as ScrollTriggerType} from 'gsap/ScrollTrigger';
 import styles from '@/app/page.module.css';
-gsap.registerPlugin(ScrollTrigger,useGSAP);
 export const MotionReadyContext=createContext(true);
 export const MotionPlayingContext=createContext(true);
 export function CampusTitle({text}:{text:string}) {
@@ -22,7 +21,9 @@ export function CreativeMotion({children}:{children:ReactNode}) {
  const heroTimeline=useRef<gsap.core.Timeline|null>(null),playingRef=useRef(playing);
  // Media-query rebuilds must use the current playback state, not the click-time closure.
  useLayoutEffect(()=>{playingRef.current=playing;},[playing]);
- useGSAP(()=>{
+ useLayoutEffect(()=>{
+  let active=true,context:gsap.Context|undefined;
+  loadMotion().then(({gsap,ScrollTrigger})=>{if(!active)return;context=gsap.context(()=>{
   const root=scope.current;if(!root||!ready)return;
   const media=gsap.matchMedia();
   const images=Array.from(root.querySelectorAll('img'));
@@ -63,7 +64,7 @@ export function CreativeMotion({children}:{children:ReactNode}) {
     if(section.getBoundingClientRect().bottom<0)tl.progress(1);
     ScrollTrigger.create({trigger:section,start:'top 80%',once:true,onEnter:()=>tl.play(),onLeave:()=>tl.progress(1)});
    });
-   const parallax:ScrollTrigger[]=[];
+   const parallax:ScrollTriggerType[]=[];
    if(!small)root.querySelectorAll<HTMLElement>('[data-parallax]').forEach(image=>{
     const tween=gsap.fromTo(image,{y:-24},{y:24,ease:'none',scrollTrigger:{trigger:image.parentElement,start:'top bottom',end:'bottom top',scrub:.8}});
     if(tween.scrollTrigger)parallax.push(tween.scrollTrigger);
@@ -77,7 +78,9 @@ export function CreativeMotion({children}:{children:ReactNode}) {
    return()=>{observer.disconnect();root.removeEventListener('focusin',focus);document.removeEventListener('visibilitychange',hidden);};
   });}catch{media.revert();gsap.set(root.querySelectorAll('[data-motion-title],[data-motion-copy],[data-motion-card],[data-image-reveal],[data-hero-line],[data-hero-image],[data-hero-copy],[data-motion-header]'),{clearProps:'transform,opacity,clipPath,visibility'});}
   return()=>{heroTimeline.current=null;alive=false;resizeObserver.disconnect();cancelAnimationFrame(refreshFrame);images.forEach(image=>image.removeEventListener('load',refresh));media.revert();};
- },{scope,dependencies:[ready],revertOnUpdate:true});
+  },scope);}).catch(()=>{});
+  return()=>{active=false;context?.revert();};
+ },[ready]);
  useLayoutEffect(()=>{if(playing)heroTimeline.current?.play();},[playing,ready]);
  return <div ref={scope}>{children}</div>;
 }
