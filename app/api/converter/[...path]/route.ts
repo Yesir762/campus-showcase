@@ -21,6 +21,7 @@ async function route(req:Request,{params}:{params:Promise<{path:string[]}>}){
   if(action==='complete'&&job?.state==='succeeded'&&job.lease&&safeEqual(lease,job.lease))return json({ok:true,resultId:job.resultId});
   if(!job||!job.lease||!safeEqual(lease,job.lease)||!job.leaseUntil||job.leaseUntil<now()||!['validating','converting','uploading'].includes(job.state))throw new HttpError(409,'任务已取消、完成或租约失效');
   if(action==='heartbeat'&&req.method==='POST'){
+   const node=req.headers.get('x-converter-node');if(node)await run('UPDATE conversion_nodes SET lastSeen=? WHERE id=?',now(),node.slice(0,80));
    const input=await body(req);const allowed=['validating','converting','uploading'];if(!allowed.includes(input.state))throw new HttpError(400,'阶段无效');
    await run('UPDATE conversion_jobs SET state=?,leaseUntil=?,updatedAt=? WHERE id=? AND lease=?',input.state,now()+90000,now(),id,lease);return json({ok:true});
   }

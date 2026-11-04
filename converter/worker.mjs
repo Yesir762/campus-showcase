@@ -13,7 +13,7 @@ if(!base.startsWith('https://')&&!/^http:\/\/(localhost|127\.0\.0\.1):/.test(bas
 const cli=fileURLToPath(new URL('./node_modules/@playcanvas/splat-transform/bin/cli.mjs',import.meta.url));
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function api(path,{method='POST',data,lease,body,signal}={}){
- const response=await fetch(`${base}/api/converter/${path}`,{method,redirect:'error',signal:signal??AbortSignal.timeout(60000),headers:{Authorization:`Bearer ${token}`,...(lease?{'X-Job-Lease':lease}:{}),...(data?{'Content-Type':'application/json'}:{})},body:body??(data?JSON.stringify(data):undefined)});
+ const response=await fetch(`${base}/api/converter/${path}`,{method,redirect:'error',signal:signal??AbortSignal.timeout(60000),headers:{Authorization:`Bearer ${token}`,'X-Converter-Node':process.env.NODE_NAME??'converter-1',...(lease?{'X-Job-Lease':lease}:{}),...(data?{'Content-Type':'application/json'}:{})},body:body??(data?JSON.stringify(data):undefined)});
  if(!response.ok){const value=await response.json().catch(()=>({error:`HTTP ${response.status}`}));throw Object.assign(Error(value.error),{status:response.status});}return response;
 }
 function command(args,signal){return new Promise((resolve,reject)=>{

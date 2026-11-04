@@ -17,7 +17,9 @@
     "db:local": "node scripts/admin/local-db.mjs",
     "resources:index": "node scripts/admin/index-bundled-resources.mjs",
     "prebuild": "npm run resources:index",
-    "test:admin:integration": "node scripts/admin/smoke-test.mjs"
+    "test:admin:integration": "node scripts/admin/smoke-test.mjs",
+    "postbuild": "node scripts/admin/externalize-models.mjs",
+    "models:seed": "node scripts/admin/seed-models.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

@@ -60,12 +60,12 @@ async function route(req:Request,{params}:{params:Promise<{path:string[]}>}){
    if(sub==='releases'&&method==='GET')return json(await all('SELECT * FROM releases WHERE sceneId=? ORDER BY createdAt DESC',id));
   }
   if(action==='assets'){
-   if(!id&&method==='GET')return json(await all('SELECT * FROM assets ORDER BY createdAt DESC'));
+   if(!id&&method==='GET')return json(await all("SELECT * FROM assets WHERE json_extract(metadata,'$.legacyPath') IS NULL ORDER BY createdAt DESC"));
    if(!id&&method==='POST'){const input=await body(req);const result=await createUpload({name:input.name,files:input.files});await log(user.id,'upload-start',result.id);return json(result);}
    if(sub==='complete'&&method==='POST'){const result=await finishUpload(id);await log(user.id,'upload-complete',id);return json(result);}
    if(id&&method==='DELETE'){
-    if(await assetReferenced(id))throw new HttpError(409,'资源仍被草稿、历史版本或转换任务引用');await abortUpload(id);
-    const a=await one<AssetRow>('SELECT * FROM assets WHERE id=?',id);if(a){let cursor:string|undefined;do{const list=await bucket().list({prefix:a.key,cursor});if(list.objects.length)await bucket().delete(list.objects.map(o=>o.key));cursor=list.truncated?list.cursor:undefined;}while(cursor);await run('DELETE FROM assets WHERE id=?',id);}await log(user.id,'delete-asset',id);return json({ok:true});
+    if(await assetReferenced(id))throw new HttpError(409,'资源仍被草稿、历史版本或转换任务引用');
+    const a=await one<AssetRow>('SELECT * FROM assets WHERE id=?',id);if(a&&JSON.parse(a.metadata).legacyPath)throw new HttpError(409,'原有模型资源需通过部署流程维护，不能在资源库删除');await abortUpload(id);if(a){let cursor:string|undefined;do{const list=await bucket().list({prefix:a.key,cursor});if(list.objects.length)await bucket().delete(list.objects.map(o=>o.key));cursor=list.truncated?list.cursor:undefined;}while(cursor);await run('DELETE FROM assets WHERE id=?',id);}await log(user.id,'delete-asset',id);return json({ok:true});
    }
   }
   if(action==='uploads'&&id){
