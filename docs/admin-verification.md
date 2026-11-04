@@ -12,3 +12,5 @@
 复验命令：`npm run test:campus`、`npx tsc --noEmit`、`npm run build`。本地集成复验可设置 `ADMIN_TEST_USERNAME`、`ADMIN_TEST_PASSWORD`，运行 `node scripts/admin/smoke-test.mjs`；该脚本只允许回环地址，会新建并归档测试场景，不能用于生产地址。
 
 未完成的设备与环境验收：真实 iOS/Android 设备、Edge/Chrome 的独立浏览器环境、真实云服务器 Docker 构建及大文件压力验证。压缩 PLY、SPZ、SPLAT、KSPLAT 的合成样例已通过完整上传和转换；仍缺少这些格式的真实生产来源样例，不能视作完成全部生产数据兼容性验证。尚未设置云端转换服务器，线上任务在节点接入前保持排队。
+
+- 生产构建已验证原 `/models` 网址通过 Worker 入口直接读取 R2；下载 SHA-256 与原模型一致，Range 分段请求返回正确字节。原模型资源独立导入，不再占用网站部署归档。
