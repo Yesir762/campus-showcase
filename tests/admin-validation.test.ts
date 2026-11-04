@@ -22,3 +22,5 @@ test('all write requests require same-origin and explicit request header',()=>{
 });
 test('publishing rejects conflicting hotspot distance and degenerate cameras',()=>{const s=structuredClone(data.scenes[0]);const b=s.bindings[s.activeVersion];b.locations=[{placeId:s.content[0].id,viewId:b.views[0].id}];b.markers=[{placeId:s.content[0].id,position:[0,0,0],minDistance:10,maxDistance:2}];assert.ok(publishIssues(s).some(x=>x.includes('距离')));b.markers=[];b.views[0].camera=b.views[0].target;assert.ok(publishIssues(s).some(x=>x.includes('重合')));});
 test('self-intersecting, duplicate and degenerate indoor boundaries are rejected',async()=>{const {isSimplePolygon}=await import('../lib/walk-geometry.ts');assert.equal(isSimplePolygon([[0,0],[2,2],[0,2],[2,0]]),false);assert.equal(isSimplePolygon([[0,0],[1,0],[2,0]]),false);assert.equal(isSimplePolygon([[0,0],[2,0],[2,2],[0,2]]),true);});
+
+test('WebP magic uses byte offsets even when its RIFF length is valid UTF-8',()=>{const head=new Uint8Array([82,73,70,70,0xc2,0xa0,0,0,87,69,66,80]);assert.equal(validateSourceHeader('a.webp',head,4096),'webp');});

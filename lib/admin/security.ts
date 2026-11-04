@@ -33,6 +33,6 @@ export function validateSourceHeader(name:string,head:Uint8Array,bytes:number){
  if(f==='json'){try{JSON.parse(s);}catch{throw new HttpError(400,'JSON 文件无效或超出 256 KB 限制');}}
  if(f==='png'&&!(head[0]===137&&s.slice(1,4)==='PNG'))throw new HttpError(400,'PNG 文件无效');
  if(['jpg','jpeg'].includes(f)&&!(head[0]===255&&head[1]===216))throw new HttpError(400,'JPEG 文件无效');
- if(f==='webp'&&!(s.startsWith('RIFF')&&s.slice(8,12)==='WEBP'))throw new HttpError(400,'WebP 文件无效');
+ if(f==='webp'&&!(head[0]===82&&head[1]===73&&head[2]===70&&head[3]===70&&head[8]===87&&head[9]===69&&head[10]===66&&head[11]===80))throw new HttpError(400,'WebP 文件无效');
  return f;
 }
