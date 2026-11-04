@@ -13,7 +13,11 @@
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate",
     "check:ply": "node scripts/check-ply.mjs",
-    "test:campus": "node --experimental-strip-types --test tests/*.test.ts"
+    "test:campus": "node --experimental-strip-types --test tests/*.test.ts",
+    "db:local": "node scripts/admin/local-db.mjs",
+    "resources:index": "node scripts/admin/index-bundled-resources.mjs",
+    "prebuild": "npm run resources:index",
+    "test:admin:integration": "node scripts/admin/smoke-test.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

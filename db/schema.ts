@@ -1,4 +1,13 @@
-// Intentionally empty by default.
-// Add Drizzle tables here when the site actually needs a database.
-// See examples/d1/db/schema.ts for an opt-in example.
-export {};
+import {sql} from 'drizzle-orm';
+import { sqliteTable, text, integer, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
+export const admins = sqliteTable('admins', {id:text().primaryKey(),username:text().notNull().unique(),password:text().notNull(),createdAt:integer().notNull()});
+export const sessions=sqliteTable('admin_sessions',{id:text().primaryKey(),adminId:text().notNull(),expiresAt:integer().notNull()});
+export const attempts=sqliteTable('login_attempts',{id:text().primaryKey(),count:integer().notNull(),expiresAt:integer().notNull()});
+export const settings=sqliteTable('settings',{id:text().primaryKey(),data:text().notNull()});
+export const scenes=sqliteTable('scenes',{id:text().primaryKey(),draft:text().notNull(),revision:integer().notNull().default(1),published:text(),position:integer().notNull().default(0),hidden:integer().notNull().default(0),archived:integer().notNull().default(0),updatedAt:integer().notNull()});
+export const releases=sqliteTable('releases',{id:text().primaryKey(),sceneId:text().notNull(),data:text().notNull(),createdAt:integer().notNull(),adminId:text().notNull()},t=>[index('releases_scene').on(t.sceneId,t.createdAt)]);
+export const assets=sqliteTable('assets',{id:text().primaryKey(),name:text().notNull(),format:text().notNull(),status:text().notNull(),bytes:integer().notNull(),key:text().notNull(),metadata:text().notNull().default('{}'),createdAt:integer().notNull()});
+export const uploads=sqliteTable('uploads',{id:text().primaryKey(),assetId:text().notNull(),uploadId:text().notNull(),key:text().notNull(),bytes:integer().notNull(),parts:text().notNull().default('[]'),createdAt:integer().notNull()});
+export const jobs=sqliteTable('conversion_jobs',{id:text().primaryKey(),assetId:text().notNull(),resultId:text(),state:text().notNull(),error:text(),lease:text(),leaseUntil:integer(),startedAt:integer(),updatedAt:integer().notNull(),createdAt:integer().notNull(),attempt:integer().notNull().default(0)},t=>[uniqueIndex('one_active_conversion_per_asset').on(t.assetId).where(sql`${t.state} IN ('queued','validating','converting','uploading')`),index('jobs_claim').on(t.state,t.createdAt)]);
+export const nodes=sqliteTable('conversion_nodes',{id:text().primaryKey(),lastSeen:integer().notNull()});
+export const audit=sqliteTable('audit_log',{id:text().primaryKey(),adminId:text().notNull(),action:text().notNull(),target:text().notNull(),createdAt:integer().notNull()});

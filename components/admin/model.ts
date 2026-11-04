@@ -1,0 +1,14 @@
+import {bindingSchema,versionSchema,type SceneBindings,type SceneDefinition,type SceneVersion} from '@/lib/scene-schema';
+export type SceneRecord={id:string;draft:string;revision:number;published:string|null;position:number;hidden:number;archived:number};
+export type Asset={id:string;name:string;format:string;status:string;bytes:number;metadata:string;createdAt:number};
+export type Job={id:string;assetId:string;resultId:string|null;state:string;error:string|null;updatedAt:number};
+export type Upload={id:string;assetId:string;key:string;bytes:number;parts:string};
+export async function request<T=unknown>(path:string,method='GET',data?:unknown):Promise<T>{const response=await fetch(`/api/admin/${path}`,{method,headers:{'X-Admin-Request':'1',...(data?{'Content-Type':'application/json'}:{})},body:data?JSON.stringify(data):undefined});const result=await response.json() as T & {error?:string};if(!response.ok)throw Error(result.error??'操作失败');return result;}
+export const newId=(prefix='item')=>`${prefix}-${crypto.randomUUID().slice(0,8)}`;
+export function defaultBinding(id:string):SceneBindings{return bindingSchema.parse({sceneVersion:id,transform:{position:[0,0,0],rotation:[0,0,0],scale:[1,1,1]},camera:{minDistance:.2,maxDistance:100,initialViewId:'overview'},views:[{id:'overview',name:'默认视角',camera:[8,9,12],target:[0,0,0]}]});}
+export function currentBinding(scene:SceneDefinition){return scene.activeVersion&&scene.bindings[scene.activeVersion]?scene.bindings[scene.activeVersion] as SceneBindings:null;}
+export function currentVersion(scene:SceneDefinition):SceneVersion|null{return scene.activeVersion&&scene.versions[scene.activeVersion]?scene.versions[scene.activeVersion] as SceneVersion:null;}
+export function assetUrl(asset:Asset){const meta=JSON.parse(asset.metadata);return `/api/assets/${asset.id}/${meta.entry??meta.files?.[0]?.path??'model.sog'}`;}
+export function addVersion(scene:SceneDefinition,url:string,format:'ply'|'sog'|'streamed-sog',label:string,bytes?:number){const id=newId('v');scene.versions[id]=versionSchema.parse({label,status:'test',format,desktopUrl:url,mobileUrl:format==='sog'?url:null,poster:scene.poster,modelNotice:bytes?`模型约 ${(bytes/1e6).toFixed(1)} MB`:'点击后载入模型',updatedAt:new Date().toISOString().slice(0,10),mobileBytes:format==='sog'?bytes:undefined});scene.bindings[id]=defaultBinding(id);scene.activeVersion=id;scene.availability='ready';}
+export function blankScene(id:string,title:string):SceneDefinition{return {id,title,summary:'',kind:'outdoor',mode:'orbit',availability:'pending',poster:'/campus-scan-placeholder.jpg',posterAlt:'场景封面',activeVersion:null,versions:{},bindings:{},content:[]};}
+export const stageLabels:Record<string,string>={uploading:'上传中',uploaded:'待转换 / 校验',queued:'排队中',validating:'校验源文件',converting:'转换 SOG',succeeded:'已完成',failed:'失败',cancelled:'已取消',ready:'可使用'};

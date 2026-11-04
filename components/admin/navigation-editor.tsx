@@ -1,0 +1,14 @@
+'use client';
+import {useState} from 'react';
+import type {SceneBindings} from '@/lib/scene-schema';
+import {NumberField} from './fields';
+type Navigation=NonNullable<SceneBindings['navigation']>;
+export function NavigationEditor({value,onChange}:{value:Navigation;onChange:(v:Navigation)=>void}){
+ const [kind,setKind]=useState<'walkable'|'obstacles'>('walkable'),[points,setPoints]=useState<[number,number][]>([]),[extent,setExtent]=useState(20);
+ const convert=(n:number)=>200+n/extent*180;
+ return <section><h3>室内区域校准</h3><p className="ad-muted">俯视 X/Z 平面。点击添加顶点，至少三个点闭合；绿色为行走区域，红色为障碍。配合中间模型核对坐标。</p><NumberField label="网格半径（世界单位）" value={extent} onChange={n=>setExtent(Math.max(1,n))}/><div className="ad-inline"><select value={kind} onChange={e=>{setKind(e.target.value as typeof kind);setPoints([]);}}><option value="walkable">绘制行走区</option><option value="obstacles">绘制障碍区</option></select><button disabled={points.length<3} onClick={()=>{onChange({...value,[kind]:[...value[kind],points]});setPoints([]);}}>闭合区域</button><button onClick={()=>setPoints(p=>p.slice(0,-1))}>撤销顶点</button></div>
+ <svg className="ad-floor" viewBox="0 0 400 400" role="img" aria-label="室内边界绘制网格" onClick={e=>{const r=e.currentTarget.getBoundingClientRect();setPoints(p=>[...p,[Number(((e.clientX-r.left)/r.width*400-200).toFixed(3))*extent/180,Number(((e.clientY-r.top)/r.height*400-200).toFixed(3))*extent/180]]);}}>
+ <defs><pattern id="floor-grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="#dce5ec" strokeWidth="1"/></pattern></defs><rect width="400" height="400" fill="url(#floor-grid)"/><path d="M200 0V400M0 200H400" stroke="#8ba4b8"/>{(['walkable','obstacles'] as const).flatMap(k=>value[k].map((poly,i)=><polygon key={`${k}-${i}`} points={poly.map(p=>`${convert(p[0])},${convert(p[1])}`).join(' ')} fill={k==='walkable'?'#50af7c55':'#e0686855'} stroke={k==='walkable'?'#238552':'#c24646'}/>))}<polyline points={points.map(p=>`${convert(p[0])},${convert(p[1])}`).join(' ')} fill="none" stroke="#216ca9" strokeWidth="2"/>{points.map((p,i)=><circle key={i} cx={convert(p[0])} cy={convert(p[1])} r="4" fill="#216ca9"/>)}<text x="380" y="194">X</text><text x="207" y="390">Z</text></svg>
+ {(['walkable','obstacles'] as const).map(k=><div key={k}>{value[k].map((p,i)=><div className="ad-inline" key={i}><span>{k==='walkable'?'行走区':'障碍'} {i+1} · {p.length} 顶点</span><button onClick={()=>onChange({...value,[k]:value[k].filter((_,n)=>n!==i)})}>删除</button></div>)}</div>)}
+ {(['floorY','eyeHeight','radius','speed'] as const).map((key,i)=><NumberField key={key} label={['地面高度','视点高度','人物半径','行走速度'][i]} value={value[key]} onChange={n=>onChange({...value,[key]:n})}/>)}<label className="ad-check"><input type="checkbox" checked={value.calibrated} onChange={e=>onChange({...value,calibrated:e.target.checked})}/>确认已校准（发布时仍检查视点合法性）</label></section>;
+}

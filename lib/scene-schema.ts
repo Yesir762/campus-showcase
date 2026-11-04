@@ -1,13 +1,13 @@
 import { z } from 'zod';
-import { isWalkable } from './walk-geometry.ts';
+import { isWalkable, isSimplePolygon } from './walk-geometry.ts';
 const number = z.number().finite();
 const vec3 = z.tuple([number, number, number]);
 const point2 = z.tuple([number, number]);
-const polygon = z.array(point2).min(3);
+const polygon = z.array(point2).min(3).refine(isSimplePolygon,'区域不能自交、退化或包含重复顶点');
 export const navigationSchema = z.object({
   calibrated: z.boolean(), floorY: number,
   eyeHeight: number.positive().default(1.6), radius: number.positive().default(0.25), speed: number.positive().default(1.2),
-  walkable: z.array(polygon).min(1), obstacles: z.array(polygon).default([]),
+  walkable: z.array(polygon), obstacles: z.array(polygon).default([]),
 });
 export const versionSchema = z.object({
   label: z.string(), status: z.enum(['test', 'production']), format: z.enum(['ply', 'sog', 'streamed-sog']),
@@ -22,7 +22,10 @@ export const bindingSchema = z.object({
   transform: z.object({ position: vec3, rotation: vec3, scale: vec3 }),
   camera: z.object({ minDistance: number.positive(), maxDistance: number.positive(), initialViewId: z.string(), fov: number.min(20).max(100).default(55), panMin: vec3.default([-8,-3,-8]), panMax: vec3.default([8,5,8]), splatBudget: number.int().positive().default(3000000) }),
   views: z.array(z.object({ id: z.string(), name: z.string(), camera: vec3, target: vec3, preview: z.object({x:number,y:number,scale:number}).optional() })).min(1),
-  markers: z.array(z.object({placeId:z.string(), position:vec3})).default([]),
+  markers: z.array(z.object({placeId:z.string(), position:vec3,
+    enabled:z.boolean().optional(),minDistance:number.nonnegative().default(0),maxDistance:number.positive().optional(),
+    appearance:z.object({style:z.enum(['card','glass','minimal']).default('card'),color:z.string().regex(/^#[0-9a-fA-F]{6}$/).default('#2466a8'),width:number.min(200).max(600).default(320),icon:z.enum(['dot','info','photo']).default('dot'),initialOpen:z.boolean().default(false)}).optional()
+  })).default([]),
   locations: z.array(z.object({placeId:z.string(),viewId:z.string()})).default([]),
   navigation: navigationSchema.optional(),
 });

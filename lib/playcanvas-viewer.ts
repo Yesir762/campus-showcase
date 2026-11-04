@@ -17,13 +17,19 @@ export type ViewerScene = {
   maxPixelRatio?: number;
   mode?: "orbit" | "walk";
   navigation?: Navigation;
-  markers?: {placeId:string;position:Vec3}[];
+  markers?: {placeId:string;position:Vec3;enabled?:boolean;minDistance?:number;maxDistance?:number}[];
+  onCamera?: (state:{camera:Vec3;target:Vec3})=>void;
   onMarkers?: (markers:{placeId:string;x:number;y:number;visible:boolean}[])=>void;
   onMetrics?: (metrics: ViewerMetrics) => void;
   onError?: (message: string) => void;
   signal?: AbortSignal;
 };
 export type SplatViewer = {
+  getCamera(): {camera:Vec3;target:Vec3};
+  setMarkers(markers:NonNullable<ViewerScene['markers']>):void;
+  setTransform(transform:ViewerScene['transform']):void;
+  setCameraOptions(options:Pick<ViewerScene,'fov'|'minDistance'|'maxDistance'|'panMin'|'panMax'>):void;
+  project(position:Vec3):{x:number;y:number;visible:boolean};
   goToView(camera: Vec3, target: Vec3): void;
   setQuality(scale: number): void;
   stopMotion(): void;
@@ -150,8 +156,9 @@ export async function createSplatViewer(canvas: HTMLCanvasElement, scene: Viewer
     camera.setPosition(position); camera.lookAt(target);
     if(scene.markers?.length && scene.onMarkers){
       const width=canvas.clientWidth,height=canvas.clientHeight;
-      scene.onMarkers(scene.markers.map(m=>{const world=new pc.Vec3(...m.position),screen=camera.camera!.worldToScreen(world);return {placeId:m.placeId,x:screen.x,y:screen.y,visible:world.clone().sub(position).dot(camera.forward)>0&&screen.x>=0&&screen.y>=0&&screen.x<=width&&screen.y<=height};}));
+      scene.onMarkers(scene.markers.map(m=>{const world=new pc.Vec3(...m.position),screen=camera.camera!.worldToScreen(world);return {placeId:m.placeId,x:screen.x,y:screen.y,visible:m.enabled!==false&&world.distance(position)>=(m.minDistance??0)&&world.distance(position)<=(m.maxDistance??Infinity)&&world.clone().sub(position).dot(camera.forward)>0&&screen.x>=0&&screen.y>=0&&screen.x<=width&&screen.y<=height};}));
     }
+    scene.onCamera?.({camera:[position.x,position.y,position.z],target:[target.x,target.y,target.z]});
     if (!readyAt || document.hidden || dt <= 0) { lowSeconds = 0; return; }
     const now = performance.now();
     frameRates.push({ at: now, fps: 1 / dt });
@@ -217,6 +224,11 @@ export async function createSplatViewer(canvas: HTMLCanvasElement, scene: Viewer
     if (scene.streamed && splat.gsplat) { splat.gsplat.lodRangeMin = 0; splat.gsplat.lodRangeMax = 2; }
     onProgress({ phase: 'ready', percent: 100 });
     return {
+      getCamera(){const p=camera.getPosition();return {camera:[p.x,p.y,p.z],target:[target.x,target.y,target.z]};},
+      setMarkers(markers){scene.markers=markers;},
+      setTransform(t){splat.setPosition(...t.position);splat.setEulerAngles(...t.rotation);splat.setLocalScale(...t.scale);},
+      setCameraOptions(o){Object.assign(scene,o);camera.camera!.fov=o.fov;},
+      project(p){const v=new pc.Vec3(...p),screen=camera.camera!.worldToScreen(v);return {x:screen.x,y:screen.y,visible:v.clone().sub(camera.getPosition()).dot(camera.forward)>0};},
       goToView(position, nextTarget) { if(walk) walk.goToView(position,nextTarget); else {desired.set(...position); target.set(...nextTarget); syncOrbit();} },
       stopMotion(){walk?.stop();pointers.clear();},
       setMove(x,z){walk?.setMove(x,z);},

@@ -1,0 +1,17 @@
+services:
+  converter:
+    build: .
+    restart: unless-stopped
+    environment:
+      SITE_URL: ${SITE_URL:?Set SITE_URL}
+      CONVERTER_TOKEN: ${CONVERTER_TOKEN:?Set CONVERTER_TOKEN}
+      NODE_NAME: converter-1
+      CONVERSION_TIMEOUT_MS: 3600000
+    mem_limit: 12g
+    cpus: 4
+    tmpfs:
+      - /tmp:size=6g,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL

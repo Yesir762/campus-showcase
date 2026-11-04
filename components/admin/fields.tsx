@@ -1,0 +1,6 @@
+'use client';
+import type {ReactNode} from 'react';
+export function Field({label,children}:{label:string;children:ReactNode}){return <label className="ad-field"><span>{label}</span>{children}</label>;}
+export function TextField({label,value,onChange,area=false}:{label:string;value:string;onChange:(v:string)=>void;area?:boolean}){return <Field label={label}>{area?<textarea value={value} onChange={e=>onChange(e.target.value)}/>:<input value={value} onChange={e=>onChange(e.target.value)}/>}</Field>;}
+export function NumberField({label,value,onChange,step=.1}:{label:string;value:number;onChange:(n:number)=>void;step?:number}){return <Field label={label}><input type="number" step={step} value={Number.isFinite(value)?value:0} onChange={e=>{if(e.target.value!==''&&Number.isFinite(e.target.valueAsNumber))onChange(e.target.valueAsNumber);}}/></Field>;}
+export function VectorField({label,value,onChange}:{label:string;value:[number,number,number];onChange:(v:[number,number,number])=>void}){return <fieldset className="ad-vector"><legend>{label}</legend>{value.map((v,i)=><label key={i}>{['X','Y','Z'][i]}<input type="number" step="0.05" value={v} onChange={e=>{if(!Number.isFinite(e.target.valueAsNumber))return;const next=[...value] as [number,number,number];next[i]=e.target.valueAsNumber;onChange(next);}}/></label>)}</fieldset>;}

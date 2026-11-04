@@ -3,10 +3,10 @@ import siteData from '@/config/site.json';
 import sceneData from '@/config/scenes.json';
 import { sceneSchema, resolveScene } from './scene-schema';
 export type { SceneVersion, SceneBindings, ResolvedScene, SceneDefinition } from './scene-schema';
-const siteSchema = z.object({schoolName:z.string(),shortName:z.string(),eyebrow:z.string(),heroTitle:z.string(),heroDescription:z.string(),aboutTitle:z.string(),aboutDescription:z.string(),footerNote:z.string(),theme:z.object({primary:z.string(),accent:z.string()})});
+export const siteSchema = z.object({schoolName:z.string(),shortName:z.string(),eyebrow:z.string(),heroTitle:z.string(),heroDescription:z.string(),aboutTitle:z.string(),aboutDescription:z.string(),footerNote:z.string(),theme:z.object({primary:z.string(),accent:z.string()})});
 export const siteConfig = siteSchema.parse(siteData);
-export const sceneCatalog = sceneData.scenes.map(s=>resolveScene(sceneSchema.parse(s)));
-if(new Set(sceneCatalog.map(s=>s.definition.id)).size!==sceneCatalog.length) throw Error('场景编号重复');
-export const getScene = (id:string)=>sceneCatalog.find(s=>s.definition.id===id);
+export const initialSceneCatalog = sceneData.scenes.map(s=>resolveScene(sceneSchema.parse(s)));
+if(new Set(initialSceneCatalog.map(s=>s.definition.id)).size!==initialSceneCatalog.length) throw Error('场景编号重复');
+
 export type SiteConfig = z.infer<typeof siteSchema>;
 export type Place = {id:string;name:string;category:string;description:string;image:string;imageAlt:string;order:number;coveredByScene:boolean;viewId:string|null};

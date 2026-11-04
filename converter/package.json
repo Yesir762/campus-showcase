@@ -1,0 +1,1 @@
+{"name":"campus-sog-converter","private":true,"type":"module","scripts":{"start":"node worker.mjs"},"dependencies":{"@playcanvas/splat-transform":"3.8.0"}}

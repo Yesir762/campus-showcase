@@ -1,5 +1,5 @@
 'use client';
-import {useCallback,useEffect,useRef,useState} from 'react';
+import {useCallback,useEffect,useRef,useState,type CSSProperties} from 'react';
 import {Expand,Shrink,Focus,Compass,X,Rotate3D,MousePointer2,LogOut} from 'lucide-react';
 import {Button} from '@/components/ui/button';
 import {Progress} from '@/components/ui/progress';
@@ -17,7 +17,7 @@ function ModelGate({state,progress,notice,label,onStart}:{state:State;progress:V
  return <div className={styles.viewerGate} aria-live="polite" role={['error','unsupported','mobile-fallback'].includes(state)?'alert':undefined}><span className={styles.gateIcon}><Rotate3D/></span>
   <h3>{state==='idle'?'进入三维场景':state==='loading'?(progress.phase==='download'?'下载模型资源':'解析与建立场景'):state==='unsupported'?'当前浏览器不支持 WebGL2':state==='mobile-fallback'?'手机轻量模型尚未配置':'三维场景加载失败'}</h3>
   <p>{state==='idle'?notice:state==='loading'?'下载完成后仍需解码与准备场景，请稍候。':'图文内容仍可独立浏览。'}</p>
-  {state==='idle'&&<><small>已选择：{label}</small><Button className={styles.primaryButton} onClick={onStart}>载入测试场景 <MousePointer2/></Button><small>点击后才下载三维资源</small></>}
+  {state==='idle'&&<><small>已选择：{label}</small><Button className={styles.primaryButton} onClick={onStart}>载入三维场景 <MousePointer2/></Button><small>点击后才下载三维资源</small></>}
   {state==='loading'&&<><Progress value={progress.percent??null} className={styles.progress}/><small>{progress.percent===undefined?'正在处理，请稍候':`${progress.percent}%`}</small></>}
   {state==='error'&&<Button onClick={onStart} className={styles.primaryButton}>重新载入</Button>}
   {['error','unsupported','mobile-fallback'].includes(state)&&<a className={styles.fallbackLink} href="#places">浏览图文介绍</a>}
@@ -30,6 +30,8 @@ export function SceneExperience({scene,bindings,definition}:{scene:SceneVersion;
  const [markers,setMarkers]=useState<{placeId:string;x:number;y:number;visible:boolean}[]>([]);
  const viewer=useRef<SplatViewer|null>(null),abort=useRef<AbortController|null>(null),canvas=useRef<HTMLCanvasElement>(null),stage=useRef<HTMLDivElement>(null),transition=useRef<ReturnType<typeof setTimeout>|null>(null);
  const walk=definition.mode==='walk';const variant=scene.variants.find(v=>v.id===variantId);const place=definition.content.find(c=>c.id===selected);
+ const selectedMarker=bindings.markers.find(m=>m.placeId===selected);
+ const popup=selectedMarker?.appearance;
  const mobileLabel=`${scene.mobileLabel} · ${resourceSize(scene.mobileBytes)}`;
  const instruction=walk?'WASD 行走 · 拖动观察 · 方向键转向':'拖动旋转 · 右键平移 · 滚轮缩放';
  const cancelTransition=useCallback(()=>{if(transition.current)clearTimeout(transition.current);transition.current=null;setFading(false);},[]);
@@ -59,7 +61,7 @@ export function SceneExperience({scene,bindings,definition}:{scene:SceneVersion;
     onMetrics:next=>{if(!controller.signal.aborted)setMetrics(next);},
     onError:message=>{if(!controller.signal.aborted){setError(message);controller.abort();cancelTransition();setState('error');}},
    },next=>{if(!controller.signal.aborted)setProgress(next);});
-   if(controller.signal.aborted){instance.destroy();return;}viewer.current=instance;setState('ready');
+   if(controller.signal.aborted){instance.destroy();return;}viewer.current=instance;setState('ready');const initial=bindings.markers.find(m=>m.enabled!==false&&m.appearance?.initialOpen);if(initial)setSelected(initial.placeId);
   }catch(e){if(controller.signal.aborted)return;stop();setError(e instanceof Error?e.message:'模型无法读取');setState('error');}
  };
  const goToView=(id:string)=>{
@@ -72,16 +74,16 @@ export function SceneExperience({scene,bindings,definition}:{scene:SceneVersion;
  return <>
   <section id="campus-3d" className={styles.experienceSection}><div className={styles.sectionHeading}><div><p className={styles.kicker}>{walk?'展厅漫游':'数字校园'}</p><h2>{walk?'走进空间，探索航海文化':'在浏览器里，漫游校园光影'}</h2></div><div className={styles.sceneStatus}><span className={styles.statusDot}/><div><b>{scene.label}</b><small>更新于 {scene.updatedAt}</small></div></div></div>
    {mobile?<div className={styles.modelControls}><span>{scene.mobileUrl?mobileLabel:'手机轻量资源准备中'}</span></div>:scene.variants.length>0&&<div className={styles.modelControls}><div className={styles.modelPicker}><span>模型精度</span><GlideSelect value={variantId} options={scene.variants.filter(v=>diagnostic||!v.diagnostic).map(v=>({value:v.id,label:v.label,tag:v.bytes?`${(v.bytes/1000000).toFixed(1)} MB`:'按需'}))} onChange={value=>{stop();setVariantId(value);setViewId(bindings.camera.initialViewId);setSelected(null);setError('');setState('idle');}} ariaLabel="模型精度" size="lg" menuWidth={340} accentColor="var(--brand)" surfaceColor="#ffffff" highlightColor="#deedfc" textColor="#234c74" radius={10} /></div><span>{resourceSize(variant?.bytes)}{variant?.points?` · ${(variant.points/10000).toFixed(0)} 万点`:''} · 切换后点击载入</span></div>}
-   <div data-model-active={state==='loading'||state==='ready'} ref={stage} className={`${styles.experience} ${fullscreen?styles.pageFullscreen:''}`} role={fullscreen?'dialog':undefined} aria-modal={fullscreen||undefined} aria-label={fullscreen?'三维校园全屏浏览':undefined}>
+   <div data-model-active={state==='loading'||state==='ready'} ref={stage} style={{'--popup-width':`${popup?.width??320}px`} as CSSProperties} className={`${styles.experience} ${fullscreen?styles.pageFullscreen:''}`} role={fullscreen?'dialog':undefined} aria-modal={fullscreen||undefined} aria-label={fullscreen?'三维校园全屏浏览':undefined}>
     <div className={styles.viewer}><canvas ref={canvas} className={styles.canvas} tabIndex={0} aria-label={`${definition.title}三维画布，${instruction}`}/>
      <ModelGate state={state} progress={progress} notice={mobile?`手机使用${mobileLabel}。${walk?'左侧摇杆移动，右侧滑动观察。':'单指旋转，双指缩放与平移。'}`:scene.modelNotice} label={mobile?mobileLabel:variant?.label??scene.label} onStart={start}/>
-     {state==='ready'&&<><div className={styles.viewerHint}>{mobile&&walk?'左侧移动 · 右侧滑动观察':instruction}</div>{markers.filter(m=>m.visible).map(m=><button key={m.placeId} className={styles.marker} style={{left:m.x,top:m.y}} aria-label={`查看${definition.content.find(c=>c.id===m.placeId)?.name??'详情'}`} onClick={()=>selectPlace(m.placeId)}><span>●</span></button>)}
+     {state==='ready'&&<><div className={styles.viewerHint}>{mobile&&walk?'左侧移动 · 右侧滑动观察':instruction}</div>{markers.filter(m=>m.visible).map(m=><button key={m.placeId} className={styles.marker} style={{left:m.x,top:m.y,color:bindings.markers.find(x=>x.placeId===m.placeId)?.appearance?.color}} aria-label={`查看${definition.content.find(c=>c.id===m.placeId)?.name??'详情'}`} onClick={()=>selectPlace(m.placeId)}><span>{({info:'ⓘ',photo:'▧',dot:'●'})[bindings.markers.find(x=>x.placeId===m.placeId)?.appearance?.icon??'dot']}</span></button>)}
       <div className={styles.viewTabs} aria-label={walk?'展区视点':'预设视角'}>{bindings.views.map(v=><button key={v.id} className={viewId===v.id?styles.viewActive:''} onClick={()=>{setSelected(null);goToView(v.id);}}>{v.name}</button>)}</div>
       {walk&&!selected&&!fading&&<WalkJoystick onMove={(x,z)=>viewer.current?.setMove(x,z)}/>}</>}
      {(state==='ready'||fullscreen)&&<div className={styles.viewerTools}>{state==='ready'&&<button aria-label={walk?'回到入口':'回到初始视角'} title={walk?'回到入口':'回到初始视角'} onClick={()=>{setSelected(null);goToView(bindings.camera.initialViewId);}}><Focus/></button>}<button data-fullscreen-toggle onClick={()=>{viewer.current?.stopMotion();setFullscreen(!fullscreen);}} aria-label={fullscreen?'退出全屏':'进入全屏'} title={fullscreen?'退出全屏':'进入全屏'} aria-pressed={fullscreen}>{fullscreen?<Shrink/>:<Expand/>}</button></div>}
      {walk&&<div className={`${styles.walkFade} ${fading?styles.walkFading:''}`} aria-hidden="true"/>}
     </div>
-    <aside className={`${styles.placePanel} ${place?styles.placePanelOpen:''}`} aria-live="polite">{place?<><button className={styles.closePanel} aria-label="关闭景点介绍" onClick={()=>{setSelected(null);canvas.current?.focus();}}><X/></button><p className={styles.kicker}>{place.category}</p><h3>{place.name}</h3><p>{place.description}</p><p className={styles.panelMeta}>{bindings.locations.some(l=>l.placeId===place.id)?'已校准观察视点':'位置待校准 · 图文独立展示'}</p></>:<div className={styles.panelEmpty}><Compass/><h3>{definition.title.replace('武汉理工大学（余家头校区）','')}</h3><p>{walk?'仅在已校准的单层区域行走。可回到入口或选择展区。':'当前为实测扫描区域。拖动观察或选择预设视角；未校准景点不开放定位。'}</p></div>}</aside>
+    <aside className={`${styles.placePanel} ${place?styles.placePanelOpen:''}`} data-popup-style={popup?.style??'card'} style={{'--popup-color':popup?.color??'var(--brand)','--popup-width':`${popup?.width??320}px` } as CSSProperties} aria-live="polite">{place?<><button className={styles.closePanel} aria-label="关闭景点介绍" onClick={()=>{setSelected(null);canvas.current?.focus();}}><X/></button><p className={styles.kicker}>{place.category}</p><h3>{place.name}</h3>{place.image&&<img className={styles.popupImage} src={place.image} alt={place.imageAlt}/>}<p>{place.description}</p><p className={styles.panelMeta}>{bindings.locations.some(l=>l.placeId===place.id)?'已校准观察视点':'位置待校准 · 图文独立展示'}</p></>:<div className={styles.panelEmpty}><Compass/><h3>{definition.title.replace('武汉理工大学（余家头校区）','')}</h3><p>{walk?'仅在已校准的单层区域行走。可回到入口或选择展区。':'当前为实测扫描区域。拖动观察或选择预设视角；未校准景点不开放定位。'}</p></div>}</aside>
    </div>
    {error&&<p role="alert" className={styles.performanceInfo}>{error}</p>}
    {metrics&&<details className={styles.performanceInfo}><summary>模型运行信息</summary><p>首次可交互：{metrics.loadSeconds.toFixed(1)} 秒；近 60 秒中位帧率：{Math.round(metrics.medianFps)} FPS；浏览时长：{Math.round(metrics.elapsedSeconds)} 秒。{metrics.resolutionReduced?'已降低渲染分辨率。':''}</p>{diagnostic&&<p>相机：{metrics.camera.join(', ')}；观察目标：{metrics.target.join(', ')}</p>}<p>本地记录不能替代正式设备、网络与内存验收。</p></details>}

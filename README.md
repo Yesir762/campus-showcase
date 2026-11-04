@@ -16,3 +16,7 @@ npm run dev
 - `config/bindings.json`：模型变换、相机视角和景点空间标记。
 
 完整替换步骤见 `docs/model-replacement.md`，公开发布前按 `docs/release-checklist.md` 验收。
+
+## 管理后台
+
+访问 `/admin` 管理场景、模型资源、视角、热点和室内行走区域。首次使用需要初始化数据库与管理员。部署和操作步骤见 [后台系统说明](docs/admin-system.md)。云端一键 SOG 转换服务位于 `converter/`，需要单独部署；未接入节点时任务会排队。

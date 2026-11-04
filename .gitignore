@@ -49,3 +49,7 @@ tsconfig.tsbuildinfo
 /public/models/**/*.ply
 /public/models/**/*.sog
 /public/models/**/streamed/
+
+/.dev.vars
+/converter/.env
+/converter/node_modules/

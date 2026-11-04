@@ -355,3 +355,11 @@
 .modelExitHint{color:#566f88;font-size:.8rem;line-height:1.8}
 @media(hover:hover){.modelExitButton:hover{background:#edf5fd;border-color:var(--brand);box-shadow:0 4px 12px #005bac12;transform:translateY(-1px)}}
 @media(prefers-reduced-motion:reduce){.modelExitButton{transition:none}.modelExitButton:hover{transform:none}}
+
+/* Admin-configured hotspot cards share the public viewer's accessible panel. */
+.placePanel[data-popup-style] { border-top: 3px solid var(--popup-color); }
+.popupImage { display:block; width:100%; max-height:200px; object-fit:cover; border-radius:8px; margin:14px 0; }
+.placePanel[data-popup-style="glass"] { background:rgba(245,250,255,.82); backdrop-filter:blur(15px); }
+.placePanel[data-popup-style="minimal"] { box-shadow:none; background:#fff; border-radius:0; }
+@media (min-width: 901px) { .experience { grid-template-columns:minmax(0,1fr) var(--popup-width,320px); } .placePanel[data-popup-style] { width:auto; } }
+@media (max-width: 900px) { .placePanel[data-popup-style] { max-width:calc(100% - 24px); width:auto; } }
